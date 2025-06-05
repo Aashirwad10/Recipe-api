@@ -34,3 +34,35 @@ A simple and beginner-friendly Recipe API built with **Node.js**, **Express**, a
 
 
 ## 🔧 Setup Instructions
+
+1. **Clone the repository**
+
+    ```
+    git clone https://github.com/Aashirwad10/Recipe-ap
+    cd Recipe-api
+    ```
+    
+2. **Install dependencies**
+
+    ```
+    npm install
+    ```
+
+3. **Create `.env` file**
+
+    - Create a `.env` file in the root folder
+    - Add your MongoDB URI like this:
+
+      ```
+      MONGO_URI= mongodb+srv://abcdefghijklmnopqrstuvwxyz
+      ```
+
+4. **Run the server**
+
+    ```
+    npm run dev
+    ```
+
+Server runs on `http://localhost:5000` (or your specified port)
+
+## 📸 API Examples
