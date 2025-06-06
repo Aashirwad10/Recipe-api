@@ -2,8 +2,45 @@ import React from 'react';
 
 function Header() {
   return (
-    <header style={{ background: '#222', color: '#fff', padding: '1rem' }}>
-      <h2>My App</h2>
+    <header className="text-gray-600 body-font">
+      <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+        <a className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0" href="#">
+          <svg
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
+          >
+            <path d="M4 3v7a2 2 0 002 2v9" /> {/* Fork */}
+            <path d="M8 3v7a2 2 0 01-2 2v9" />
+            <path d="M20 5h-2a2 2 0 00-2 2v2a5 5 0 004 4.9V21" /> {/* Spoon */}
+          </svg>
+          <span className="ml-3 text-xl">Recipes</span>
+        </a>
+        <nav className="md:ml-auto md:mr-auto flex flex-wrap items-center text-base justify-center">
+          <a className="mr-5 hover:text-gray-900" href="#">Home</a>
+          <a className="mr-5 hover:text-gray-900" href="#">Second Link</a>
+          <a className="mr-5 hover:text-gray-900" href="#">Third Link</a>
+          <a className="mr-5 hover:text-gray-900" href="#">Fourth Link</a>
+        </nav>
+        <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
+          L/O
+          <svg
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="w-4 h-4 ml-1"
+            viewBox="0 0 24 24"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7"></path>
+          </svg>
+        </button>
+      </div>
     </header>
   );
 }
