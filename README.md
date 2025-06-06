@@ -67,4 +67,4 @@ Server runs on `http://localhost:5000` (or your specified port)
 
 ## 📸 API Examples
 
-**UPDATE TOMORROW**
+**UPDATE SOON**
