@@ -34,35 +34,36 @@ app.post("/api/recipes", async(req, res) => {// create recipe
     }
 });
 
-app.get("/api/recipes", async (req, res) => {// get recipes (also by cat)
-    try {
-        const filter = {};
+app.get("/api/recipes", async (req, res) => { // get recipes (also by cat) + pagination support
+  try {
+    const filter = {};
 
-        // Check if category query param exists
-        if (req.query.category) {
-            filter.category = { $regex: new RegExp(`^${req.query.category}$`, "i") };
-        }
-
-        const recipes = await Recipe.find(filter);
-
-        if (recipes.length === 0) {
-            return res.status(200).json({
-                success: false,
-                message: "No recipes found for the selected category"
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            data: recipes,
-            message: "Recipes fetched successfully"
-        });
-    }catch (error) {
-        res.status(500).json({
-            success: false,
-            message: "Couldn't get recipes, something went wrong"
-        });
+    if (req.query.category) {
+      filter.category = { $regex: new RegExp(`^${req.query.category}$`, "i") };
     }
+
+    // Pagination params with defaults
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 9;
+    const skip = (page - 1) * limit;
+
+    const total = await Recipe.countDocuments(filter);
+    const recipes = await Recipe.find(filter).skip(skip).limit(limit);
+
+    res.status(200).json({
+      success: true,
+      data: recipes,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+      message: "Recipes fetched successfully"
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Couldn't get recipes, something went wrong"
+    });
+  }
 });
 
 app.get("/api/recipes/:id", async (req, res) => { // get recipe by id
@@ -157,6 +158,8 @@ app.post("/api/contact", async (req, res) => { // contact us
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+
 
 app.listen(5000, () => {
     connectDB();

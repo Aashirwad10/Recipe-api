@@ -7,38 +7,62 @@ import { Link } from 'react-router-dom';
 const Recipe = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(""); // For future search
+  const [searchTerm, setSearchTerm] = useState(""); // for client-side search
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchRecipes = async (category = "") => {
+  const limit = 9;
+
+  const fetchRecipes = async (pageNum = 1, category = "", append = false) => {
     setLoading(true);
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes`, {
-        params: { category }
-      });
+      const params = { page: pageNum, limit };
+      if (category) params.category = category;
+
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/recipes`, { params });
+
       if (response.data.success) {
-        setRecipes(response.data.data);
+        if (append) {
+          // Append new recipes to existing list
+          setRecipes((prev) => [...prev, ...response.data.data]);
+        } else {
+          // Replace recipes list on new filter or first load
+          setRecipes(response.data.data);
+        }
+        setTotalPages(response.data.totalPages);
       } else {
-        setRecipes([]);
-        console.log("No recipes found");
+        if (!append) setRecipes([]);
       }
     } catch (error) {
       console.error("Error fetching recipes:", error);
-      setRecipes([]);
+      if (!append) setRecipes([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch recipes on mount and whenever category changes
+  // Fetch recipes on mount and when category or page changes
   useEffect(() => {
-    fetchRecipes(selectedCategory);
+    fetchRecipes(page, selectedCategory, page !== 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, selectedCategory]);
+
+  // When category changes, reset page to 1
+  useEffect(() => {
+    setPage(1);
   }, [selectedCategory]);
 
-  // Filter by searchTerm on the client side (optional for now)
+  // Filter by searchTerm on client side (optional)
   const filteredRecipes = recipes.filter(recipe =>
     recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleLoadMore = () => {
+    if (page < totalPages) {
+      setPage((prev) => prev + 1);
+    }
+  };
 
   return (
     <>
@@ -106,55 +130,71 @@ const Recipe = () => {
           </form>
 
           {/* Recipes List */}
-          {loading ? (
+          {loading && page === 1 ? (
             <p className="text-center text-xl">Loading...</p>
           ) : (
-            <div className="flex flex-wrap -m-4">
-              {filteredRecipes.length > 0 ? (
-                filteredRecipes.map((item, index) => (
-                  <div className="p-4 md:w-1/3" key={index}>
-                    <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
-                      <img
-                        className="lg:h-48 md:h-36 w-full object-cover object-center"
-                        src={item.image || 'https://via.placeholder.com/400x300'}
-                        alt="recipe"
-                      />
-                      <div className="p-6">
-                        <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
-                          {item.category}
-                        </h2>
-                        <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
-                          {item.title}
-                        </h1>
-                        <p className="leading-relaxed mb-3">{item.description}</p>
-                        <div className="flex items-center flex-wrap">
-                          <Link
-                            to={`/recipes/${item._id}`}
-                            className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
-                          >
-                            Learn More
-                            <svg
-                              className="w-4 h-4 ml-2"
-                              viewBox="0 0 24 24"
-                              stroke="currentColor"
-                              strokeWidth="2"
-                              fill="none"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
+            <>
+              <div className="flex flex-wrap -m-4">
+                {filteredRecipes.length > 0 ? (
+                  filteredRecipes.map((item, index) => (
+                    <div className="p-4 md:w-1/3" key={item._id}>
+                      <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
+                        <img
+                          className="lg:h-48 md:h-36 w-full object-cover object-center"
+                          src={item.image || 'https://via.placeholder.com/400x300'}
+                          alt="recipe"
+                        />
+                        <div className="p-6">
+                          <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
+                            {item.category}
+                          </h2>
+                          <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
+                            {item.title}
+                          </h1>
+                          <p className="leading-relaxed mb-3">{item.description}</p>
+                          <div className="flex items-center flex-wrap">
+                            <Link
+                              to={`/recipes/${item._id}`}
+                              className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
                             >
-                              <path d="M5 12h14" />
-                              <path d="M12 5l7 7-7 7" />
-                            </svg>
-                          </Link>
+                              Learn More
+                              <svg
+                                className="w-4 h-4 ml-2"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                fill="none"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              >
+                                <path d="M5 12h14" />
+                                <path d="M12 5l7 7-7 7" />
+                              </svg>
+                            </Link>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-center w-full text-gray-500">No recipes found.</p>
+                  ))
+                ) : (
+                  <p className="text-center w-full text-gray-500">No recipes found.</p>
+                )}
+              </div>
+
+              {/* Load More button */}
+              {!loading && page < totalPages && (
+                <div className="flex justify-center mt-8">
+                  <button
+                    onClick={handleLoadMore}
+                    className="bg-indigo-500 text-white px-6 py-3 rounded-full hover:bg-indigo-600 transition"
+                  >
+                    Load More
+                  </button>
+                </div>
               )}
-            </div>
+
+              {loading && page > 1 && <p className="text-center mt-6">Loading more...</p>}
+            </>
           )}
         </div>
       </section>
