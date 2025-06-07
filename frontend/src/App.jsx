@@ -5,6 +5,7 @@ import Recipe from './pages/Recipe';
 import Submit from './pages/Submit';
 import ContactUs from './pages/ContactUs';
 import RecipeDetail from './pages/RecipeDetail';
+import NotFound from './pages/NotFound';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
         <Route path="/submit" element={<Submit />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
+        <Route path="*" element={<NotFound />} />
         {/* Add more routes here */}
       </Routes>
     </Router>
