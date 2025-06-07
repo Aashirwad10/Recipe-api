@@ -29,13 +29,13 @@ function Header() {
             Home
           </Link>
           <Link
-            to="/about"
+            to="/recipes"
             className={`mr-5 ${isActive('/recipes') ? 'text-red-500 font-semibold' : 'hover:text-gray-900'}`}
           >
             Recipes
           </Link>
           <Link
-            to="/recipes"
+            to="/submit"
             className={`mr-5 ${isActive('/submit') ? 'text-red-500 font-semibold' : 'hover:text-gray-900'}`}
           >
             Submit
