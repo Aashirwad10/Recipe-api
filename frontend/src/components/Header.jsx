@@ -29,21 +29,21 @@ function Header() {
           </Link>
           <Link
             to="/about"
-            className={`mr-5 ${isActive('/about') ? 'text-red-500 font-semibold' : 'hover:text-gray-900'}`}
-          >
-            About
-          </Link>
-          <Link
-            to="/recipes"
             className={`mr-5 ${isActive('/recipes') ? 'text-red-500 font-semibold' : 'hover:text-gray-900'}`}
           >
             Recipes
           </Link>
           <Link
+            to="/recipes"
+            className={`mr-5 ${isActive('/submit') ? 'text-red-500 font-semibold' : 'hover:text-gray-900'}`}
+          >
+            Submit
+          </Link>
+          <Link
             to="/contact"
             className={`mr-5 ${isActive('/contact') ? 'text-red-500 font-semibold' : 'hover:text-gray-900'}`}
           >
-            Contact
+            Contact Us
           </Link>
         </nav>
 
