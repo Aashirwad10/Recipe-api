@@ -40,7 +40,7 @@ const Recipe = () => {
                   <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
                     <img
                       className="lg:h-48 md:h-36 w-full object-cover object-center"
-                      src="/recipe-sample.png" // or replace with item.image if you add images later
+                      src={item.image}
                       alt="recipe"
                     />
                     <div className="p-6">
