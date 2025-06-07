@@ -40,7 +40,7 @@ app.get("/api/recipes", async (req, res) => {// get recipes (also by cat)
 
         // Check if category query param exists
         if (req.query.category) {
-            filter.category = req.query.category;
+            filter.category = { $regex: new RegExp(`^${req.query.category}$`, "i") };
         }
 
         const recipes = await Recipe.find(filter);
