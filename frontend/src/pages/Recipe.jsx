@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import { Link } from 'react-router-dom';
 
 const Recipe = () => {
   const [recipes, setRecipes] = useState([]);
@@ -40,7 +41,7 @@ const Recipe = () => {
                   <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
                     <img
                       className="lg:h-48 md:h-36 w-full object-cover object-center"
-                      src={item.image}
+                      src={item.image || 'https://via.placeholder.com/400x300'} // fallback image if none
                       alt="recipe"
                     />
                     <div className="p-6">
@@ -52,7 +53,10 @@ const Recipe = () => {
                       </h1>
                       <p className="leading-relaxed mb-3">{item.description}</p>
                       <div className="flex items-center flex-wrap">
-                        <a className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0 cursor-pointer">
+                        <Link
+                          to={`/recipes/${item._id}`}
+                          className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
+                        >
                           Learn More
                           <svg
                             className="w-4 h-4 ml-2"
@@ -66,7 +70,7 @@ const Recipe = () => {
                             <path d="M5 12h14" />
                             <path d="M12 5l7 7-7 7" />
                           </svg>
-                        </a>
+                        </Link>
                       </div>
                     </div>
                   </div>
