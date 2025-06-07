@@ -41,22 +41,28 @@ function Header() {
           >
             Recipes
           </Link>
-          <Link
-            to="/submit"
-            className={`mr-5 ${
-              isActive("/submit") ? "text-red-500 font-semibold" : "hover:text-gray-900"
-            }`}
-          >
-            Submit
-          </Link>
-          <Link
-            to="/contact"
-            className={`mr-5 ${
-              isActive("/contact") ? "text-red-500 font-semibold" : "hover:text-gray-900"
-            }`}
-          >
-            Contact Us
-          </Link>
+
+          {/* Only show these if signed in */}
+          {isSignedIn && (
+            <>
+              <Link
+                to="/submit"
+                className={`mr-5 ${
+                  isActive("/submit") ? "text-red-500 font-semibold" : "hover:text-gray-900"
+                }`}
+              >
+                Submit
+              </Link>
+              <Link
+                to="/contact"
+                className={`mr-5 ${
+                  isActive("/contact") ? "text-red-500 font-semibold" : "hover:text-gray-900"
+                }`}
+              >
+                Contact Us
+              </Link>
+            </>
+          )}
         </nav>
 
         {/* Login / Logout button */}
