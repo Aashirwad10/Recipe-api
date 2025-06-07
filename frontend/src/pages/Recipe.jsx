@@ -7,10 +7,13 @@ import { Link } from 'react-router-dom';
 const Recipe = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState(""); // for client-side search
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Track saved recipes by their IDs
+  const [savedRecipes, setSavedRecipes] = useState(new Set());
 
   const limit = 9;
 
@@ -24,10 +27,8 @@ const Recipe = () => {
 
       if (response.data.success) {
         if (append) {
-          // Append new recipes to existing list
           setRecipes((prev) => [...prev, ...response.data.data]);
         } else {
-          // Replace recipes list on new filter or first load
           setRecipes(response.data.data);
         }
         setTotalPages(response.data.totalPages);
@@ -42,18 +43,15 @@ const Recipe = () => {
     }
   };
 
-  // Fetch recipes on mount and when category or page changes
   useEffect(() => {
     fetchRecipes(page, selectedCategory, page !== 1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, selectedCategory]);
 
-  // When category changes, reset page to 1
   useEffect(() => {
     setPage(1);
   }, [selectedCategory]);
 
-  // Filter by searchTerm on client side (optional)
   const filteredRecipes = recipes.filter(recipe =>
     recipe.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -62,6 +60,19 @@ const Recipe = () => {
     if (page < totalPages) {
       setPage((prev) => prev + 1);
     }
+  };
+
+  // Toggle save state for a recipe
+  const toggleSave = (id) => {
+    setSavedRecipes(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
   };
 
   return (
@@ -113,7 +124,6 @@ const Recipe = () => {
                   <option value="Dinner">Dinner</option>
                   <option value="Dessert">Dessert</option>
                 </select>
-                {/* Custom arrow */}
                 <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-indigo-400">
                   <svg
                     className="w-4 h-4"
@@ -136,52 +146,88 @@ const Recipe = () => {
             <>
               <div className="flex flex-wrap -m-4">
                 {filteredRecipes.length > 0 ? (
-                  filteredRecipes.map((item, index) => (
-                    <div className="p-4 md:w-1/3" key={item._id}>
-                      <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
-                        <img
-                          className="lg:h-48 md:h-36 w-full object-cover object-center"
-                          src={item.image || 'https://via.placeholder.com/400x300'}
-                          alt="recipe"
-                        />
-                        <div className="p-6">
-                          <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
-                            {item.category}
-                          </h2>
-                          <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
-                            {item.title}
-                          </h1>
-                          <p className="leading-relaxed mb-3">{item.description}</p>
-                          <div className="flex items-center flex-wrap">
-                            <Link
-                              to={`/recipes/${item._id}`}
-                              className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
-                            >
-                              Learn More
-                              <svg
-                                className="w-4 h-4 ml-2"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                fill="none"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
+                  filteredRecipes.map((item) => {
+                    const isSaved = savedRecipes.has(item._id);
+                    return (
+                      <div className="p-4 md:w-1/3" key={item._id}>
+                        <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
+                          <img
+                            className="lg:h-48 md:h-36 w-full object-cover object-center"
+                            src={item.image || 'https://via.placeholder.com/400x300'}
+                            alt="recipe"
+                          />
+                          <div className="p-6">
+                            <div className="flex items-center justify-between mb-1">
+                              <h2 className="tracking-widest text-xs title-font font-medium text-gray-400">
+                                {item.category}
+                              </h2>
+
+                              <button
+                                onClick={() => toggleSave(item._id)}
+                                aria-label={isSaved ? "Unsave Recipe" : "Save Recipe"}
+                                className="focus:outline-none"
                               >
-                                <path d="M5 12h14" />
-                                <path d="M12 5l7 7-7 7" />
-                              </svg>
-                            </Link>
+                                {isSaved ? (
+                                  // Filled bookmark (saved) - red color
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6 text-red-500"
+                                    fill="currentColor"
+                                    viewBox="0 0 24 24"
+                                    stroke="none"
+                                  >
+                                    <path d="M6 4a2 2 0 0 0-2 2v16l8-5 8 5V6a2 2 0 0 0-2-2H6z" />
+                                  </svg>
+                                ) : (
+                                  // Outline bookmark (unsaved)
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-6 w-6 text-indigo-400 hover:text-indigo-600 transition-colors"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2}
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 4a2 2 0 0 0-2 2v16l8-5 8 5V6a2 2 0 0 0-2-2H6z" />
+                                  </svg>
+                                )}
+                              </button>
+                            </div>
+
+                            <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
+                              {item.title}
+                            </h1>
+                            <p className="leading-relaxed mb-3">{item.description}</p>
+                            <div className="flex items-center flex-wrap">
+                              <Link
+                                to={`/recipes/${item._id}`}
+                                className="text-indigo-500 inline-flex items-center md:mb-2 lg:mb-0"
+                              >
+                                Learn More
+                                <svg
+                                  className="w-4 h-4 ml-2"
+                                  viewBox="0 0 24 24"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  fill="none"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <path d="M5 12h14" />
+                                  <path d="M12 5l7 7-7 7" />
+                                </svg>
+                              </Link>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 ) : (
                   <p className="text-center w-full text-gray-500">No recipes found.</p>
                 )}
               </div>
 
-              {/* Load More button */}
               {!loading && page < totalPages && (
                 <div className="flex justify-center mt-8">
                   <button
