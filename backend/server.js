@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import Recipe from "./models/recipe.model.js";
+import Contact from "./models/contact.model.js";
 
 dotenv.config();
 
@@ -138,6 +139,23 @@ app.delete("/api/recipes/:id", async (req, res) => { // delete recipe
             message: "Couldn't delete recipe, something went wrong"
         });
     }
+});
+
+app.post("/api/contact", async (req, res) => { // contact us
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ success: false, message: "Email is required" });
+  }
+
+  try {
+    const newContact = await Contact.create({ email });
+    res.status(200).json({ success: true, message: "Thank you for contacting us!" });
+  } catch (error) {
+    if (error.code === 11000) { // duplicate email
+      return res.status(400).json({ success: false, message: "Email already submitted" });
+    }
+    res.status(500).json({ success: false, message: "Server error" });
+  }
 });
 
 app.listen(5000, () => {
