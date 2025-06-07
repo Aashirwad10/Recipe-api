@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import pp from '../assets/pp.png';
 import "../App.css";
+import { Link } from 'react-router-dom';
 
 
 function Home() {
@@ -27,12 +28,16 @@ function Home() {
             </p>
 
             <div className="flex justify-center">
+              <Link to="/recipes">
                 <button className="inline-flex text-white bg-red-500 border-0 py-2 px-6 focus:outline-none hover:bg-red-600 rounded text-lg">
                     Browse Recipes
                 </button>
+              </Link>
+              <Link to="/submit">
                 <button className="ml-4 inline-flex text-gray-700 bg-gray-100 border-0 py-2 px-6 focus:outline-none hover:bg-gray-200 rounded text-lg">
                     Submit Your Own
                 </button>
+              </Link>
             </div>
           </div>
 
