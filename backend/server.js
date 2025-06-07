@@ -11,15 +11,15 @@ app.use(cors());
 app.use(express.json());
 
 app.post("/api/recipes", async(req, res) => {// create recipe
-    const { title, description, ingredients, category,steps } = req.body;
-    if(!title || !description || !ingredients || !category || !steps) {
+    const { title, description, ingredients, category,steps,image } = req.body;
+    if(!title || !description || !ingredients || !category || !steps || !image) {
         return res.status(400).json({ 
             success: false,
             message: "All fields are required"
         });
     }
     try{
-        const newRecipe = await Recipe.create({title, description, ingredients, category,steps});
+        const newRecipe = await Recipe.create({title, description, ingredients, category,steps,image});
         res.status(201).json({
             success: true,
             data: newRecipe,

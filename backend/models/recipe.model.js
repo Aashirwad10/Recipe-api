@@ -19,6 +19,9 @@ const recipeSchema = new mongoose.Schema({
   steps: {
     type: [String],
     required: true
+  },
+  image: {
+    type: String // URL of the image
   }
 },
 {
