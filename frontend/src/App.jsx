@@ -7,6 +7,7 @@ import ContactUs from './pages/ContactUs';
 import RecipeDetail from './pages/RecipeDetail';
 import NotFound from './pages/NotFound';
 import RequireAuth from './auth/RequireAuth';
+import SavedRecipe from './pages/SavedRecipe';
 
 function App() {
   return (
@@ -15,6 +16,14 @@ function App() {
       <Route path="/recipes" element={<Recipe />} />
       
       {/* Protect these routes */}
+      <Route 
+        path="/saved" 
+        element={
+          <RequireAuth>
+            <SavedRecipe />
+          </RequireAuth>
+        } 
+      />
       <Route 
         path="/submit" 
         element={

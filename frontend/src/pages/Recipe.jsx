@@ -3,6 +3,7 @@ import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { Link } from 'react-router-dom';
+import { useUser } from '@clerk/clerk-react'; // <--- import Clerk hook
 
 const Recipe = () => {
   const [recipes, setRecipes] = useState([]);
@@ -16,6 +17,9 @@ const Recipe = () => {
   const [savedRecipes, setSavedRecipes] = useState(new Set());
 
   const limit = 9;
+
+  // Use Clerk's hook to check login state
+  const { isSignedIn } = useUser();
 
   const fetchRecipes = async (pageNum = 1, category = "", append = false) => {
     setLoading(true);
@@ -162,36 +166,41 @@ const Recipe = () => {
                                 {item.category}
                               </h2>
 
-                              <button
-                                onClick={() => toggleSave(item._id)}
-                                aria-label={isSaved ? "Unsave Recipe" : "Save Recipe"}
-                                className="focus:outline-none"
-                              >
-                                {isSaved ? (
-                                  // Filled bookmark (saved) - red color
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-6 w-6 text-red-500"
-                                    fill="currentColor"
-                                    viewBox="0 0 24 24"
-                                    stroke="none"
-                                  >
-                                    <path d="M6 4a2 2 0 0 0-2 2v16l8-5 8 5V6a2 2 0 0 0-2-2H6z" />
-                                  </svg>
-                                ) : (
-                                  // Outline bookmark (unsaved)
-                                  <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    className="h-6 w-6 text-indigo-400 hover:text-indigo-600 transition-colors"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                    strokeWidth={2}
-                                  >
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 4a2 2 0 0 0-2 2v16l8-5 8 5V6a2 2 0 0 0-2-2H6z" />
-                                  </svg>
-                                )}
-                              </button>
+                              {/* Show save icon only if user is signed in */}
+                              {isSignedIn && (
+                                <button
+                                  onClick={() => toggleSave(item._id)}
+                                  aria-label={isSaved ? "Unsave Recipe" : "Save Recipe"}
+                                  className="focus:outline-none"
+                                >
+                                  {isSaved ? (
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-6 w-6 text-red-500"
+                                      fill="currentColor"
+                                      viewBox="0 0 24 24"
+                                      stroke="none"
+                                    >
+                                      <path d="M6 4a2 2 0 0 0-2 2v16l8-5 8 5V6a2 2 0 0 0-2-2H6z" />
+                                    </svg>
+                                  ) : (
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      className="h-6 w-6 text-indigo-400 hover:text-indigo-600 transition-colors"
+                                      fill="none"
+                                      viewBox="0 0 24 24"
+                                      stroke="currentColor"
+                                      strokeWidth={2}
+                                    >
+                                      <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 4a2 2 0 0 0-2 2v16l8-5 8 5V6a2 2 0 0 0-2-2H6z"
+                                      />
+                                    </svg>
+                                  )}
+                                </button>
+                              )}
                             </div>
 
                             <h1 className="title-font text-lg font-medium text-gray-900 mb-3">

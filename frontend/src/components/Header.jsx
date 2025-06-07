@@ -46,6 +46,14 @@ function Header() {
           {isSignedIn && (
             <>
               <Link
+                to="/saved"
+                className={`mr-5 ${
+                  isActive("/profile") ? "text-red-500 font-semibold" : "hover:text-gray-900"
+                }`}
+              >
+                Saved
+              </Link>
+              <Link
                 to="/submit"
                 className={`mr-5 ${
                   isActive("/submit") ? "text-red-500 font-semibold" : "hover:text-gray-900"
