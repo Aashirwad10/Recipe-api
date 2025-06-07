@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 const Recipe = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState(""); // For future search functionality
 
   const fetchRecipes = async () => {
     try {
@@ -30,8 +31,22 @@ const Recipe = () => {
   return (
     <>
       <Header />
+
       <section className="text-gray-600 body-font">
-        <div className="container px-5 py-24 mx-auto">
+        <div className="container px-5 py-10 mx-auto">
+          {/* Search Bar Struct */}
+          <form className="mb-10 flex justify-center">
+            <input
+              type="text"
+              name="search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search recipes..."
+              className="w-full max-w-md px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-200"
+            />
+            {/* In future: add search icon or button */}
+          </form>
+
           {loading ? (
             <p className="text-center text-xl">Loading...</p>
           ) : (
@@ -41,7 +56,7 @@ const Recipe = () => {
                   <div className="h-full border-2 border-gray-200 border-opacity-60 rounded-lg overflow-hidden">
                     <img
                       className="lg:h-48 md:h-36 w-full object-cover object-center"
-                      src={item.image || 'https://via.placeholder.com/400x300'} // fallback image if none
+                      src={item.image || 'https://via.placeholder.com/400x300'}
                       alt="recipe"
                     />
                     <div className="p-6">
@@ -76,10 +91,14 @@ const Recipe = () => {
                   </div>
                 </div>
               ))}
+              {recipes.length === 0 && (
+                <p className="text-center w-full text-gray-500">No recipes found.</p>
+              )}
             </div>
           )}
         </div>
       </section>
+
       <Footer />
     </>
   );
