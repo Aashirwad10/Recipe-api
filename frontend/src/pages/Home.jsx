@@ -2,6 +2,7 @@ import React from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import pp from '../assets/pp.png';
+import "../App.css";
 
 
 function Home() {
