@@ -1,7 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+
+const Notification = ({ message, type, onClose }) => {
+  // type: "success" | "error"
+  const bgColor = type === "success" ? "bg-green-500" : "bg-red-500";
+  const icon = type === "success" ? "🎉" : "❌";
+
+  useEffect(() => {
+    if (!message) return;
+    const timer = setTimeout(() => {
+      onClose();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [message, onClose]);
+
+  if (!message) return null;
+
+  return (
+    <div
+      className={`${bgColor} fixed top-6 right-6 z-50 rounded-lg shadow-lg text-white px-5 py-3 flex items-center space-x-3 max-w-sm`}
+      role="alert"
+    >
+      <span className="text-2xl">{icon}</span>
+      <p className="font-semibold">{message}</p>
+      <button
+        onClick={onClose}
+        aria-label="Close notification"
+        className="ml-auto text-white hover:text-gray-200 focus:outline-none"
+      >
+        ✖️
+      </button>
+    </div>
+  );
+};
 
 const Submit = () => {
   const [form, setForm] = useState({
@@ -28,7 +61,6 @@ const Submit = () => {
     setErrorMsg("");
 
     try {
-      // Prepare data - convert comma separated strings to arrays for ingredients & steps
       const payload = {
         title: form.title.trim(),
         description: form.description.trim(),
@@ -65,28 +97,36 @@ const Submit = () => {
     <>
       <Header />
 
-      <section className="text-gray-600 body-font relative">
-        <div className="container px-5 py-24 mx-auto">
-          <div className="flex flex-col text-center w-full mb-12">
-            <h1 className="sm:text-3xl text-2xl font-medium title-font mb-4 text-gray-900">
-              Submit a New Recipe
+      {/* Notification popup */}
+      <Notification
+        message={successMsg || errorMsg}
+        type={successMsg ? "success" : "error"}
+        onClose={() => {
+          setSuccessMsg("");
+          setErrorMsg("");
+        }}
+      />
+
+      <section className="text-gray-700 body-font relative bg-gradient-to-b from-indigo-50 to-white py-20 min-h-screen flex flex-col justify-center">
+        <div className="container mx-auto px-5">
+          <div className="text-center mb-16 max-w-3xl mx-auto">
+            <h1 className="text-4xl font-extrabold text-indigo-700 mb-3 tracking-wide drop-shadow-sm">
+              🍳 Submit a New Recipe
             </h1>
-            <p className="lg:w-2/3 mx-auto leading-relaxed text-base">
-              Fill out the form below to add your recipe.
+            <p className="text-lg text-indigo-600/80">
+              Share your delicious creations with the community! Fill out the form below.
             </p>
-            {successMsg && <p className="mt-4 text-green-600 font-semibold">{successMsg}</p>}
-            {errorMsg && <p className="mt-4 text-red-600 font-semibold">{errorMsg}</p>}
           </div>
 
           <form
             onSubmit={handleSubmit}
-            className="lg:w-1/2 md:w-2/3 mx-auto"
+            className="bg-white shadow-lg rounded-lg p-10 max-w-2xl mx-auto"
           >
-            <div className="flex flex-wrap -m-2">
+            <div className="flex flex-col space-y-6">
 
-              <div className="p-2 w-full">
-                <label htmlFor="title" className="leading-7 text-sm text-gray-600">
-                  Title
+              <div>
+                <label htmlFor="title" className="block mb-2 text-indigo-700 font-semibold text-sm">
+                  📝 Title
                 </label>
                 <input
                   type="text"
@@ -95,13 +135,14 @@ const Submit = () => {
                   value={form.title}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  placeholder="e.g. Classic Chocolate Cake"
+                  className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 text-gray-800"
                 />
               </div>
 
-              <div className="p-2 w-full">
-                <label htmlFor="description" className="leading-7 text-sm text-gray-600">
-                  Description
+              <div>
+                <label htmlFor="description" className="block mb-2 text-indigo-700 font-semibold text-sm">
+                  📝 Description
                 </label>
                 <textarea
                   id="description"
@@ -109,13 +150,14 @@ const Submit = () => {
                   value={form.description}
                   onChange={handleChange}
                   required
-                  className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 h-24 text-base outline-none text-gray-700 py-2 px-3 resize-none leading-6 transition-colors duration-200 ease-in-out"
+                  placeholder="Briefly describe your recipe"
+                  className="w-full border border-indigo-300 rounded-lg px-4 py-3 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 text-gray-800 h-28"
                 ></textarea>
               </div>
 
-              <div className="p-2 w-full">
-                <label htmlFor="ingredients" className="leading-7 text-sm text-gray-600">
-                  Ingredients (comma separated)
+              <div>
+                <label htmlFor="ingredients" className="block mb-2 text-indigo-700 font-semibold text-sm">
+                  🥄 Ingredients (comma separated)
                 </label>
                 <input
                   type="text"
@@ -125,13 +167,13 @@ const Submit = () => {
                   onChange={handleChange}
                   placeholder="e.g. sugar, flour, eggs"
                   required
-                  className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 text-gray-800"
                 />
               </div>
 
-              <div className="p-2 w-full">
-                <label htmlFor="category" className="leading-7 text-sm text-gray-600">
-                  Category
+              <div>
+                <label htmlFor="category" className="block mb-2 text-indigo-700 font-semibold text-sm">
+                  🗂 Category
                 </label>
                 <input
                   type="text"
@@ -141,13 +183,13 @@ const Submit = () => {
                   onChange={handleChange}
                   placeholder="e.g. Dessert, Vegan, Quick"
                   required
-                  className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 text-gray-800"
                 />
               </div>
 
-              <div className="p-2 w-full">
-                <label htmlFor="steps" className="leading-7 text-sm text-gray-600">
-                  Steps (comma separated)
+              <div>
+                <label htmlFor="steps" className="block mb-2 text-indigo-700 font-semibold text-sm">
+                  🔪 Steps (comma separated)
                 </label>
                 <input
                   type="text"
@@ -157,13 +199,13 @@ const Submit = () => {
                   onChange={handleChange}
                   placeholder="e.g. Preheat oven, Mix ingredients, Bake for 30 minutes"
                   required
-                  className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 text-gray-800"
                 />
               </div>
 
-              <div className="p-2 w-full">
-                <label htmlFor="image" className="leading-7 text-sm text-gray-600">
-                  Image URL
+              <div>
+                <label htmlFor="image" className="block mb-2 text-indigo-700 font-semibold text-sm">
+                  🖼 Image URL
                 </label>
                 <input
                   type="url"
@@ -173,19 +215,17 @@ const Submit = () => {
                   onChange={handleChange}
                   placeholder="https://example.com/image.jpg"
                   required
-                  className="w-full bg-gray-100 bg-opacity-50 rounded border border-gray-300 focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-2 px-3 leading-8 transition-colors duration-200 ease-in-out"
+                  className="w-full border border-indigo-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-600 text-gray-800"
                 />
               </div>
 
-              <div className="p-2 w-full">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex mx-auto text-white bg-indigo-500 border-0 py-3 px-10 focus:outline-none hover:bg-indigo-600 rounded text-lg transition-colors disabled:opacity-50"
-                >
-                  {loading ? "Submitting..." : "Submit Recipe"}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-4 bg-gradient-to-r from-indigo-600 to-indigo-400 hover:from-indigo-700 hover:to-indigo-500 text-white font-bold py-3 rounded-lg shadow-lg transition-all duration-300 disabled:opacity-50"
+              >
+                {loading ? "Submitting..." : "Submit Recipe"}
+              </button>
 
             </div>
           </form>
