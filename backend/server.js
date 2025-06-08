@@ -159,8 +159,6 @@ app.post("/api/contact", async (req, res) => { // contact us
   }
 });
 
-
-
 app.listen(5000, () => {
     connectDB();
     console.log("server online on port 5000");
